@@ -1,0 +1,29 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Include task to install packages that enable apt over HTTPS
+      ansible.builtin.include_tasks: includes/apt_over_https.yml
+
+    - name: Include task to install useful packages
+      ansible.builtin.include_tasks: includes/install_useful_packages.yml
+
+    - name: Install HAProxy
+      ansible.builtin.apt:
+        name: haproxy
+        state: present
+        update_cache: yes
+
+    - name: Copy haproxy.cfg to /etc/haproxy/haproxy.cfg
+      ansible.builtin.copy:
+        src: ../files/haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+        mode: 0600
+      notify: restart haproxy
+
+  # Setup a handler for restarting haproxy
+  handlers:
+    - name: restart haproxy
+      ansible.builtin.service:
+        name: haproxy
+        state: restarted
