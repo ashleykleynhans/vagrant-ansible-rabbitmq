@@ -1,0 +1,65 @@
+---
+- name: Add Ubuntu 21.10 security as a source for libssl1.1 dependency for Erlang
+  ansible.builtin.apt_repository:
+    repo: deb http://security.ubuntu.com/ubuntu impish-security main
+    state: present
+
+- name: Add an apt signing key for Erlang
+  ansible.builtin.shell: >-
+    curl -fsSL https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
+    gpg --dearmor --yes -o /usr/share/keyrings/erlang.gpg
+
+- name: Add apt repository for Erlang
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/erlang.gpg] https://packages.erlang-solutions.com/ubuntu focal contrib
+    state: present
+
+#- name: Install Erlang dependencies
+#  ansible.builtin.apt:
+#    name: "{{ packages }}"
+#    state: present
+#    update_cache: yes
+#  vars:
+#    packages:
+#      - erlang-crypto
+#      - erlang-appmon
+#      - erlang-inets
+#      - erlang-ssl
+
+- name: Install Erlang
+  ansible.builtin.apt:
+    name: erlang
+    state: present
+    update_cache: yes
+
+- name: Add an apt signing key for RabbitMQ
+  ansible.builtin.shell: >-
+    curl -fsSL https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey |
+    gpg --dearmor --yes -o /usr/share/keyrings/rabbitmq.gpg
+
+- name: Add apt repository for RabbitMQ
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ jammy main
+    state: present
+
+- name: Install RabbitMQ
+  ansible.builtin.apt:
+    name: rabbitmq-server
+    state: present
+    update_cache: yes
+
+- name: Enable RabbitMQ Management Plugin
+  ansible.builtin.command: >-
+    rabbitmq-plugins enable rabbitmq_management
+
+- name: Set hostname
+  ansible.builtin.command: >-
+    hostnamectl set-hostname {{ inventory_hostname }} --static
+
+- name: Copy hosts file
+  ansible.builtin.copy:
+    src: ../files/hosts
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: 0644

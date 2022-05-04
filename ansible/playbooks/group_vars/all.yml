@@ -1,0 +1,4 @@
+---
+rabbitmq_admin_user: admin
+rabbitmq_admin_password: t3sTP@$$
+rabbitmq_cluster_name: test-rabbitmq-cluster

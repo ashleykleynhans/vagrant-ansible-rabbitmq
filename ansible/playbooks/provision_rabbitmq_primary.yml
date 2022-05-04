@@ -8,3 +8,18 @@
 
     - name: Include task to install useful packages
       ansible.builtin.include_tasks: includes/install_useful_packages.yml
+
+    - name: Include task to install RabbitMQ server
+      ansible.builtin.include_tasks: includes/install_rabbitmq_server.yml
+
+    - name: Register Erlang Cookie
+      ansible.builtin.command: >-
+        cat /var/lib/rabbitmq/.erlang.cookie
+      register: erlang_cookie
+
+    - name: Save Erlang Cookie to file
+      ansible.builtin.template:
+        src: ../templates/erlang_cookie.j2
+        dest: /tmp/erlang-cookie
+      delegate_to: localhost
+      become: no

@@ -1,0 +1,24 @@
+---
+- name: Add RabbitMQ admin user
+  ansible.builtin.command: >-
+    rabbitmqctl add_user {{ rabbitmq_admin_user }} {{ rabbitmq_admin_password }}
+
+- name: Tag admin user as administrator
+  ansible.builtin.command: >-
+    rabbitmqctl set_user_tags {{ rabbitmq_admin_user }} administrator
+
+- name: Set permissions for admin user
+  ansible.builtin.command: >-
+    rabbitmqctl set_permissions -p / {{ rabbitmq_admin_user }} ".*" ".*" ".*"
+
+- name: Delete guest user
+  ansible.builtin.command: >-
+    rabbitmqctl delete_user guest
+
+- name: Set HA policy
+  ansible.builtin.command: >-
+    rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+
+- name: Set RabbitMQ Cluster name
+  ansible.builtin.command: >-
+    rabbitmqctl set_cluster_name {{ rabbitmq_cluster_name }}

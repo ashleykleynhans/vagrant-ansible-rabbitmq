@@ -1,0 +1,37 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    erlang_cookie: "{{ lookup('file', '/tmp/erlang-cookie') }}"
+
+  tasks:
+    - name: Include task to install packages that enable apt over HTTPS
+      ansible.builtin.include_tasks: includes/apt_over_https.yml
+
+    - name: Include task to install useful packages
+      ansible.builtin.include_tasks: includes/install_useful_packages.yml
+
+    - name: Include task to install RabbitMQ server
+      ansible.builtin.include_tasks: includes/install_rabbitmq_server.yml
+
+    - name: Set Erlang cookie
+      ansible.builtin.shell: >-
+        echo "{{ erlang_cookie }}" | tee /var/lib/rabbitmq/.erlang.cookie
+
+    - name: Restart RabbitMQ server
+      ansible.builtin.systemd:
+        name: rabbitmq-server
+        state: restarted
+
+    - name: Stop RabbitMQ app
+      ansible.builtin.command: >-
+        rabbitmqctl stop_app
+
+    - name: Join node to RabbitMQ cluster
+      ansible.builtin.command: >-
+        rabbitmqctl join_cluster rabbit@rabbitmq-1
+
+    - name: Start RabbitMQ app
+      ansible.builtin.command: >-
+        rabbitmqctl start_app
