@@ -22,6 +22,7 @@ Vagrant.configure("2") do |config|
         lb.vm.hostname = "rabbitmq-lb"
         lb.vm.network :private_network, ip: PRIVATE_IP_NW + "#{LB_IP_START}"
         lb.vm.provision "ansible" do |ansible|
+            ansible.compatibility_mode = "2.0"
             ansible.playbook = "ansible/playbooks/provision_lb.yml"
             ansible.extra_vars = {
                 node_ip: PRIVATE_IP_NW + "#{LB_IP_START}",
@@ -30,25 +31,33 @@ Vagrant.configure("2") do |config|
     end
 
     # Provision RabbitMQ Nodes
-    (1..RABBITMQ_NODES).each do |i|
-        config.vm.define "rabbitmq-#{i}" do |node|
+    (1..RABBITMQ_NODES).each do |server_id|
+        config.vm.define "rabbitmq-#{server_id}" do |node|
             # Name shown in the GUI
             node.vm.provider "virtualbox" do |vb|
-                vb.name = "rabbitmq-#{i}"
+                vb.name = "rabbitmq-#{server_id}"
                 vb.memory = 2048
                 vb.cpus = 2
             end
-            node.vm.hostname = "rabbitmq-#{i}"
-            node.vm.network :private_network, ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + i}"
+            node.vm.hostname = "rabbitmq-#{server_id}"
+            node.vm.network :private_network, ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + server_id}"
             node.vm.provision "ansible" do |ansible|
-                if i == 1
+                ansible.compatibility_mode = "2.0"
+                if server_id == 1
                     ansible.playbook = "ansible/playbooks/provision_rabbitmq_primary.yml"
                 else
                     ansible.playbook = "ansible/playbooks/provision_rabbitmq_secondary.yml"
                 end
                 ansible.extra_vars = {
-                    node_ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + i}",
+                    node_ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + server_id}",
                 }
+            end
+            if server_id == RABBITMQ_NODES
+                node.vm.provision "ansible" do |ansible|
+                    ansible.limit = "rabbitmq-1"
+                    ansible.compatibility_mode = "2.0"
+                    ansible.playbook = "ansible/playbooks/configure_rabbitmq_cluster.yml"
+                end
             end
         end
     end

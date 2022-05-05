@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+
+  vars:
+    erlang_cookie: "{{ lookup('file', '/tmp/erlang-cookie') }}"
+
+  tasks:
+    - name: Include task to set RabbitMQ permissions
+      ansible.builtin.include_tasks: includes/set_rabbitmq_permissions.yml
+
+    - name: Register RabbitMQ version
+      ansible.builtin.command: >-
+        rabbitmqctl version
+      register: rabbitmq_version
+
+# TODO: Does not currently support RabbitMQ 3.10.0, add back once there is a version that supports it
+#    - name: Download Delayed Message Exchange plugin to the RabbitMQ lib directory
+#      ansible.builtin.get_url:
+#        url: https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/3.9.0/rabbitmq_delayed_message_exchange-3.9.0.ez
+#        dest: "/usr/lib/rabbitmq/lib/rabbitmq_server-{{ rabbitmq_version.stdout_lines[0] }}/plugins/rabbitmq_delayed_message_exchange-3.9.0.ez"
+#
+#    - name: Enable Delayed Message Exchange plugin
+#      ansible.builtin.command: >-
+#        rabbitmq-plugins enable rabbitmq_delayed_message_exchange
