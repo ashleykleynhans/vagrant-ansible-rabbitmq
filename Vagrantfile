@@ -33,7 +33,6 @@ Vagrant.configure("2") do |config|
     # Provision RabbitMQ Nodes
     (1..RABBITMQ_NODES).each do |server_id|
         config.vm.define "rabbitmq-#{server_id}" do |node|
-            # Name shown in the GUI
             node.vm.provider "virtualbox" do |vb|
                 vb.name = "rabbitmq-#{server_id}"
                 vb.memory = 2048
@@ -52,6 +51,9 @@ Vagrant.configure("2") do |config|
                     node_ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + server_id}",
                 }
             end
+
+            # Only run this playbook on the primary node once all nodes are up and
+            # fully provisioned
             if server_id == RABBITMQ_NODES
                 node.vm.provision "ansible" do |ansible|
                     ansible.limit = "rabbitmq-1"
