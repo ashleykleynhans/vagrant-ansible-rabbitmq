@@ -1,6 +1,6 @@
 VAGRANT_IMAGE_NAME = "ashleykleynhans/jammy64"
 
-RABBITMQ_NODES = 2
+RABBITMQ_NODES = 3
 
 RABBITMQ_IP_START = 20
 LB_IP_START = 30
@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "rabbitmq-lb" do |lb|
         lb.vm.provider "virtualbox" do |vb|
             vb.name = "rabbitmq-lb"
-            vb.memory = 512
+            vb.memory = 256
             vb.cpus = 1
         end
         lb.vm.hostname = "rabbitmq-lb"
@@ -35,8 +35,8 @@ Vagrant.configure("2") do |config|
         config.vm.define "rabbitmq-#{server_id}" do |node|
             node.vm.provider "virtualbox" do |vb|
                 vb.name = "rabbitmq-#{server_id}"
-                vb.memory = 2048
-                vb.cpus = 2
+                vb.memory = 1024
+                vb.cpus = 1
             end
             node.vm.hostname = "rabbitmq-#{server_id}"
             node.vm.network :private_network, ip: PRIVATE_IP_NW + "#{RABBITMQ_IP_START + server_id}"
