@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     config.vm.define "rabbitmq-lb" do |lb|
         lb.vm.provider "virtualbox" do |vb|
             vb.name = "rabbitmq-lb"
-            vb.memory = 256
+            vb.memory = 512
             vb.cpus = 1
         end
         lb.vm.hostname = "rabbitmq-lb"
