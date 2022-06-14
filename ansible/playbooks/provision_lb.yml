@@ -21,6 +21,12 @@
         mode: 0600
       notify: restart haproxy
 
+    - name: Install keepalived
+      ansible.builtin.apt:
+        name: keepalived
+        state: present
+        update_cache: yes
+
   # Setup a handler for restarting haproxy
   handlers:
     - name: restart haproxy
