@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
         config.vm.define "rabbitmq-lb-#{server_id}" do |lb|
             lb.vm.provider "virtualbox" do |vb|
                 vb.name = "rabbitmq-lb-#{server_id}"
-                vb.memory = 512
+                vb.memory = 1024
                 vb.cpus = 1
                 vb.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
             end
