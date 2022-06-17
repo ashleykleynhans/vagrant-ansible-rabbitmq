@@ -11,3 +11,4 @@
       - mlocate
       - dnsutils
       - nagios-plugins
+      - iptables-persistent

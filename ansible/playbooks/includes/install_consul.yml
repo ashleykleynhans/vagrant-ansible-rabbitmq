@@ -28,3 +28,35 @@
     group: root
     mode: 0644
   notify: restart consul
+
+- name: Create /etc/systemd/resolved.conf.d directory
+  ansible.builtin.file:
+    path: /etc/systemd/resolved.conf.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy consul.conf to /etc/systemd/resolved.conf.d/consul.conf
+  ansible.builtin.copy:
+    src: ../files/consul.conf
+    dest: /etc/systemd/resolved.conf.d/consul.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Setup iptables port forwarding for Consul DNS
+  ansible.builtin.shell: >-
+    /usr/sbin/iptables --table nat --append OUTPUT --destination localhost --protocol {{ item }} --match {{ item }} --dport 53 --jump REDIRECT --to-ports 8600
+  loop:
+    - tcp
+    - udp
+
+- name: Save iptabls rules
+  ansible.builtin.shell: >-
+    /usr/sbin/iptables-save > /etc/iptables/rules.v4
+
+- name: Restart systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
