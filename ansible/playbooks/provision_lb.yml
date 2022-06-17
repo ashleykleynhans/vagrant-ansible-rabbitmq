@@ -24,12 +24,6 @@
         mode: 0600
       notify: restart haproxy
 
-    - name: Install keepalived
-      ansible.builtin.apt:
-        name: keepalived
-        state: present
-        update_cache: yes
-
     - name: Copy consul-client.hcl to /etc/consul.d/consul-client.hcl
       ansible.builtin.copy:
         src: ../files/consul-client.hcl
