@@ -1,0 +1,30 @@
+---
+- name: Add an apt signing key for Hashicorp
+  ansible.builtin.shell: >-
+    curl -fsSL https://apt.releases.hashicorp.com/gpg |
+    gpg --dearmor --yes -o /usr/share/keyrings/hashicorp.gpg
+
+- name: Add apt repository for Hashicorp
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by=/usr/share/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com jammy main
+    state: present
+
+- name: Install Consul
+  ansible.builtin.apt:
+    name: consul
+    state: present
+    update_cache: yes
+
+- name: Remove default consul.hcl
+  ansible.builtin.file:
+    path: /etc/consul.d/consul.hcl
+    state: absent
+
+- name: Copy consul.service to /lib/systemd/system/consul.service
+  ansible.builtin.copy:
+    src: ../files/consul.service
+    dest: /lib/systemd/system/consul.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart consul

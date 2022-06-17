@@ -1,7 +1,6 @@
 ---
 - hosts: all
   become: true
-
   tasks:
     - name: Include task to install packages that enable apt over HTTPS
       ansible.builtin.include_tasks: includes/apt_over_https.yml
@@ -12,25 +11,10 @@
     - name: Include task to install Consul
       ansible.builtin.include_tasks: includes/install_consul.yml
 
-    - name: Include task to install RabbitMQ server
-      ansible.builtin.include_tasks: includes/install_rabbitmq_server.yml
-
-    - name: Register Erlang Cookie
-      ansible.builtin.command: >-
-        cat /var/lib/rabbitmq/.erlang.cookie
-      register: erlang_cookie
-
-    - name: Save Erlang Cookie to file
-      ansible.builtin.template:
-        src: ../templates/erlang_cookie.j2
-        dest: /tmp/erlang-cookie
-      delegate_to: localhost
-      become: no
-
-    - name: Copy consul-client.hcl to /etc/consul.d/consul-client.hcl
+    - name: Copy consul-server.hcl to /etc/consul.d/consul-server.hcl
       ansible.builtin.copy:
-        src: ../files/consul-client.hcl
-        dest: /etc/consul.d/consul-client.hcl
+        src: ../files/consul-server.hcl
+        dest: /etc/consul.d/consul-server.hcl
         owner: consul
         group: consul
         mode: 0644

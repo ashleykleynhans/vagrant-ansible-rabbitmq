@@ -12,6 +12,9 @@
     - name: Include task to install useful packages
       ansible.builtin.include_tasks: includes/install_useful_packages.yml
 
+    - name: Include task to install Consul
+      ansible.builtin.include_tasks: includes/install_consul.yml
+
     - name: Include task to install RabbitMQ server
       ansible.builtin.include_tasks: includes/install_rabbitmq_server.yml
 
@@ -35,3 +38,20 @@
     - name: Start RabbitMQ app
       ansible.builtin.command: >-
         rabbitmqctl start_app
+
+    - name: Copy consul-client.hcl to /etc/consul.d/consul-client.hcl
+      ansible.builtin.copy:
+        src: ../files/consul-client.hcl
+        dest: /etc/consul.d/consul-client.hcl
+        owner: consul
+        group: consul
+        mode: 0644
+      notify: restart consul
+
+  handlers:
+    - name: restart consul
+      ansible.builtin.systemd:
+        name: consul
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
