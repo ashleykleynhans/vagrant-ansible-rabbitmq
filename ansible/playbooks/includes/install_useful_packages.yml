@@ -10,3 +10,4 @@
       - jq
       - mlocate
       - dnsutils
+      - nagios-plugins

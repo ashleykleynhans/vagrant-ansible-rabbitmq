@@ -1,6 +1,12 @@
 # vagrant-ansible-rabbitmq
 
-Provision a RabbitMQ cluster on Ubuntu 22.04 LTS using Vagrant, Virtualbox and Ansible.
+Provision a High Availability [RabbitMQ](https://www.rabbitmq.com/)
+cluster on Ubuntu 22.04 LTS using [Vagrant](https://www.vagrantup.com/),
+[Virtualbox](https://www.virtualbox.org/) and
+[Ansible](https://docs.ansible.com/ansible/latest/).  The cluster uses
+[Hashicorp Consul](https://www.consul.io/) for monitoring the health of
+the nodes in the cluster and an [HAProxy](https://www.haproxy.org/) load
+balancer to ensure High Availability.
 
 ## Clone the GitHub Repository
 

@@ -17,16 +17,16 @@ Vagrant.configure("2") do |config|
 
     # Provision Consul Cluster
     (1..CONSUL_NODES).each do |server_id|
-        config.vm.define "consul-#{server_id}" do |lb|
-            lb.vm.provider "virtualbox" do |vb|
+        config.vm.define "consul-#{server_id}" do |consul|
+            consul.vm.provider "virtualbox" do |vb|
                 vb.name = "consul-#{server_id}"
                 vb.memory = 1024
                 vb.cpus = 1
                 vb.customize ["modifyvm", :id, "--cpuexecutioncap", "50"]
             end
-            lb.vm.hostname = "consul-#{server_id}"
-            lb.vm.network :private_network, ip: PRIVATE_IP_NW + "#{CONSUL_IP_START + server_id}"
-            lb.vm.provision "ansible" do |ansible|
+            consul.vm.hostname = "consul-#{server_id}"
+            consul.vm.network :private_network, ip: PRIVATE_IP_NW + "#{CONSUL_IP_START + server_id}"
+            consul.vm.provision "ansible" do |ansible|
                 ansible.compatibility_mode = "2.0"
                 ansible.playbook = "ansible/playbooks/provision_consul_server.yml"
                 ansible.extra_vars = {
