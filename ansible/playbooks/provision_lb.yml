@@ -33,7 +33,7 @@
         mode: 0644
       notify: restart consul
 
-    - name: Copy rabbitmq-service.hcl to /etc/consul.d/rabbitmq-service.hcl
+    - name: Copy haproxy-service.hcl to /etc/consul.d/haproxy-service.hcl
       ansible.builtin.copy:
         src: ../files/haproxy-service.hcl
         dest: /etc/consul.d/haproxy-service.hcl
