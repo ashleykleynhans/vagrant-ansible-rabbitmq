@@ -1,13 +1,15 @@
 ---
 - name: Add an apt signing key for Hashicorp
-  ansible.builtin.shell: >-
-    curl -fsSL https://apt.releases.hashicorp.com/gpg |
-    gpg --dearmor --yes -o /usr/share/keyrings/hashicorp.gpg
+  ansible.builtin.apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+    keyring: /usr/share/keyrings/hashicorp.gpg
 
 - name: Add apt repository for Hashicorp
   ansible.builtin.apt_repository:
     repo: deb [signed-by=/usr/share/keyrings/hashicorp.gpg] https://apt.releases.hashicorp.com jammy main
     state: present
+    filename: hashicorp
 
 - name: Install Consul
   ansible.builtin.apt:
